@@ -10,6 +10,15 @@ import metricsRoute from './routes/metrics';
 dotenv.config();
 logger.init();
 
+function isErrorWithMessage(err: unknown): err is { message: string } {
+  return typeof err === 'object' && err !== null && 'message' in err && typeof (err as any).message === 'string';
+}
+function getErrorMessage(err: unknown): string {
+  if (typeof err === 'string') return err;
+  if (isErrorWithMessage(err)) return err.message;
+  return String(err ?? 'Unknown error');
+}
+
 const app = express();
 app.use(express.json());
 
@@ -23,9 +32,9 @@ app.use('/metrics', metricsRoute);
 
 // Central error handler
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  const message = err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err);
-  console.error({ err }, 'Unhandled error');
-  res.status(500).json({ error: message ?? 'Internal Server Error' });
+  const message = getErrorMessage(err);
+  console.error('Unhandled error:', message);
+  res.status(500).json({ error: message });
 });
 
 const PORT = process.env.PORT ?? 3000;

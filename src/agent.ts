@@ -37,11 +37,18 @@ export const askAgent = async (question: string) => {
             answer = await qaChain.invoke({ query: question });
         } else {
             const timeoutMs = parseInt(process.env.TIMEOUT_RESPONSE, 10);
+            const controller = new AbortController();
 
-            const answerPromise = qaChain.invoke({ query: question });
+            const answerPromise = qaChain.invoke(
+                { query: question },
+                { callbacks: [], signal: controller.signal }
+            );
 
             const timeout = (ms: number) =>
-                new Promise<never>((_, rej) => setTimeout(() => rej(new Error("invoke timeout")), ms));
+                new Promise<never>((_, rej) => setTimeout(() => {
+                    controller.abort();
+                    rej(new Error("invoke timeout"));
+                }, ms));
 
             // race the invoke promise against timeout
             answer = (await Promise.race([answerPromise, timeout(timeoutMs)])) as { text?: string };

@@ -10,6 +10,21 @@ A simple Retrieval-Augmented Generation (RAG) agent that reads files, creates em
 - Optional invoke timeout handling
 - Environment-configurable (via .env)
 
+## System Architecture
+The project follows a Retrieval-Augmented Generation (RAG) pattern:
+1. **Ingestion**: `ingest.ts` reads PDF files from `FILE_PATH`, chunks them using `RecursiveCharacterTextSplitter`, and generates embeddings via `OllamaEmbeddings`.
+2. **Storage**: Vectors are stored in an in-memory `MemoryVectorStore`.
+3. **Retrieval**: When a question is asked, the `MemoryVectorStore` retrieves the most relevant chunks.
+4. **Generation**: `agent.ts` uses `ChatOllama` to generate a response based on the retrieved context.
+
+## Technical Stack
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js
+- **AI Orchestration**: LangChain
+- **Embeddings/LLM**: Ollama (local)
+- **Observability**: Prometheus (`prom-client`)
+- **Configuration**: Dotenv
+
 ## Requirements
 - Node.js 18+ (or compatible)
 - npm or yarn
