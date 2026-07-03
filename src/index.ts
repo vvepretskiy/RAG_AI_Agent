@@ -6,6 +6,7 @@ import askRoute from './routes/ask';
 import healthRoute from './routes/health';
 import metricsMiddleware from './metrics'; // metrics.ts should export default middleware and metricsHandler
 import metricsRoute from './routes/metrics';
+import embeddingMetricsRoute from './routes/embeddingMetrics';
 
 dotenv.config();
 logger.init();
@@ -29,6 +30,7 @@ if (metricsMiddleware) app.use(metricsMiddleware);
 app.use('/ask', askRoute);
 app.use('/health', healthRoute);
 app.use('/metrics', metricsRoute);
+app.use('/embedding-metrics', embeddingMetricsRoute);
 
 // Central error handler
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
